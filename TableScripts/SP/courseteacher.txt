@@ -1,0 +1,144 @@
+
+//////////////***********Course Teacher Ins Upd********************////////////
+DELIMITER $$
+CREATE  PROCEDURE sp_courseteacher_ins_upd(
+    IN in_Id INT(11),
+    IN in_FullName VARCHAR(80),
+    IN in_Address VARCHAR(200),
+    IN in_ContactNumber VARCHAR(14),
+    IN in_Email VARCHAR(80), 
+    IN in_InterestedArea VARCHAR(400),
+    IN in_Designation VARCHAR(60),
+    IN in_AcademicDescription VARCHAR(400),
+    IN in_Message VARCHAR(1000),
+    IN in_JoinDate date,
+    IN in_EmployementStatus INT(11),
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11),
+    IN in_Picture VARCHAR(60),
+    IN in_UserType INT(11),
+    IN in_Salary FLOAT(10,2)
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM   courseteacher)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO  courseteacher(Id, 	FullName,  Address, ContactNumber, Email, InterestedArea, Designation, 	AcademicDescription, Message, JoinDate, EmployementStatus, CreatedBy, ModifiedBy, Picture, Status, UserType, Salary) 
+VALUES(MaxId, in_FullName, in_Address, in_ContactNumber, in_Email, in_InterestedArea, in_Designation, in_AcademicDescription, in_Message, in_JoinDate, in_EmployementStatus,  in_CreatedBy, in_ModifiedBy, in_Picture, 0,
+ in_UserType, in_Salary);
+  ELSE
+  	UPDATE  courseteacher 
+    	SET
+    FullName = in_FullName,
+    Address =  in_Address,
+    ContactNumber =  in_ContactNumber,
+    Email = in_Email,
+    InterestedArea = in_InterestedArea,
+    Designation = in_Designation,
+    AcademicDescription = in_AcademicDescription,
+    Message = in_Message,
+    JoinDate = in_JoinDate,
+    EmployementStatus = in_EmployementStatus,
+    ModifiedBy = in_ModifiedBy,
+    Picture  =  in_Picture,
+    ModifyDate = now(),
+    Status = 1,
+    UserType = in_UserType,
+    Salary = in_Salary
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+
+DELIMITER ;
+
+
+
+//////******************Sel SelById*************///////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_courseteacher_sel_selbyid`(in in_Id INT, in in_UserType INT)
+
+BEGIN
+    
+    if (in_Id > 0) then
+        SELECT ct.Id, ct.FullName, ct.Address, ct.ContactNumber, ct.Email, ct.InterestedArea, ct.Designation, 
+
+ct.AcademicDescription, ct.Message, ct.JoinDate, ct.EmployementStatus, ct.CreationDate, ct.CreatedBy, ct.ModifyDate, 
+
+ct.Picture, ct.Status, ct.UserType, ct.Salary, (SELECT FullName FROM user WHERE Id = ct.CreatedBy) AS CreatedByUserName,  
+
+(SELECT FullName FROM user WHERE Id = ct.ModifiedBy) AS ModifiedBy  FROM courseteacher ct where   ct.Status <> 9 AND 
+ct.Id = in_Id ORDER BY ct.Id DESC;
+
+
+    elseif (in_UserType > 0) then
+        SELECT ct.Id, ct.FullName, ct.Address, ct.ContactNumber, ct.Email, ct.InterestedArea, ct.Designation, 
+
+ct.AcademicDescription, ct.Message, ct.JoinDate, ct.EmployementStatus, ct.CreationDate, ct.CreatedBy, ct.ModifyDate, 
+
+ct.Picture, ct.Status, ct.UserType, ct.Salary, (SELECT FullName FROM user WHERE Id = ct.CreatedBy) AS CreatedByUserName,  
+
+(SELECT FullName FROM user WHERE Id = ct.ModifiedBy) AS ModifiedBy  FROM courseteacher ct where ct.Status <> 9 AND 
+
+ct.UserType = in_UserType  ORDER BY ct.Id DESC;
+
+    else 
+SELECT ct.Id, ct.FullName, ct.Address, ct.ContactNumber, ct.Email, ct.InterestedArea, ct.Designation, 
+
+ct.AcademicDescription, ct.Message, ct.JoinDate, ct.EmployementStatus, ct.CreationDate, ct.CreatedBy, ct.ModifyDate, 
+
+ct.Picture, ct.Status, ct.UserType, ct.Salary, (SELECT FullName FROM user WHERE Id = ct.CreatedBy) AS CreatedByUserName,  
+
+(SELECT FullName FROM user WHERE Id = ct.ModifiedBy) AS ModifiedBy  FROM courseteacher ct ORDER BY ct.Id DESC;
+    end if;
+
+END
+
+
+
+
+///////////*****************Check Exist******************//////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_courseteacher_exist`(
+    IN in_Email VARCHAR(80)
+)
+BEGIN
+  SELECT Id FROM courseteacher WHERE Status<>9 AND Email=in_Email;
+END$$
+ 
+DELIMITER ;
+
+
+
+///////////*****************Teacher Sel by Limit******************//////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_courseteacher_selbylimit`(
+    IN in_Limit INT,
+    IN in_UserType INT
+)
+BEGIN
+	IF in_UserType>0 THEN
+        SELECT ct.Id, ct.FullName, ct.Address, ct.ContactNumber, ct.Email, ct.InterestedArea, ct.Designation, 
+
+ct.AcademicDescription, ct.Message, ct.JoinDate, ct.EmployementStatus, ct.CreationDate, ct.CreatedBy, ct.ModifyDate, 
+
+ct.Picture, ct.Status, ct.UserType, ct.Salary, (SELECT FullName FROM user WHERE Id = ct.CreatedBy) AS CreatedByUserName,  
+
+(SELECT FullName FROM user WHERE Id = ct.ModifiedBy) AS ModifiedBy  FROM courseteacher ct where   ct.Status <> 9  AND ct.UserType=in_UserType ORDER BY ct.Id DESC LIMIT in_Limit;
+	
+	ELSE
+        SELECT ct.Id, ct.FullName, ct.Address, ct.ContactNumber, ct.Email, ct.InterestedArea, ct.Designation, 
+
+ct.AcademicDescription, ct.Message, ct.JoinDate, ct.EmployementStatus, ct.CreationDate, ct.CreatedBy, ct.ModifyDate, 
+
+ct.Picture, ct.Status, ct.UserType, ct.Salary, (SELECT FullName FROM user WHERE Id = ct.CreatedBy) AS CreatedByUserName,  
+
+(SELECT FullName FROM user WHERE Id = ct.ModifiedBy) AS ModifiedBy  FROM courseteacher ct where   ct.Status <> 9 ORDER BY ct.Id DESC LIMIT in_Limit;
+	END IF;
+
+END$$
+ 
+DELIMITER ;

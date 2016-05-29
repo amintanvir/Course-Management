@@ -1,0 +1,67 @@
+///////////****************Ins Upd IncomeCategory************////////////
+DELIMITER $$
+CREATE  PROCEDURE sp_incomecategory_ins_upd(
+    IN in_Id INT(11),
+    IN in_IncomeCategoryName VARCHAR(80),
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11)
+    
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM incomecategory)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO incomecategory(Id, IncomeCategoryName, CreatedBy, ModifiedBy) VALUES(MaxId, in_IncomeCategoryName, 
+
+in_CreatedBy, 
+
+in_ModifiedBy);
+  ELSE
+  	UPDATE incomecategory 
+    	SET
+    IncomeCategoryName = in_IncomeCategoryName,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+DELIMITER ;
+
+
+//////////***************Sel Sel By Id**************////////////////////
+DELIMITER $$
+CREATE PROCEDURE sp_incomecategory_sel_selbyid(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+   SELECT * , (SELECT UserName FROM user WHERE Id=CreatedBy) AS CreateByUserName, (SELECT UserName FROM user WHERE Id=ModifiedBy) AS ModifiedByUserName FROM incomecategory WHERE Status<>9 ORDER BY Id DESC;
+  ELSE
+    SELECT * , (SELECT UserName FROM user WHERE Id=CreatedBy) AS CreateByUserName, (SELECT UserName FROM user WHERE Id=ModifiedBy) AS ModifiedByUserName  FROM incomecategory WHERE Id = in_Id  ORDER BY Id DESC;
+    
+  END IF;
+END$$
+DELIMITER ;
+
+
+////////////**************Delete*********************//////////////////
+DELIMITER $$
+CREATE PROCEDURE sp_incomecategory_del(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+UPDATE incomecategory 
+    	SET
+    ModifyDate = now(),
+    ModifiedBy = in_ModifiedBy,
+    Status = 9
+	WHERE 
+    Id = in_Id;
+	
+END$$
+DELIMITER ;

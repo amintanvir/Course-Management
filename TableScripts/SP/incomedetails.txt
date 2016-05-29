@@ -1,0 +1,68 @@
+////////////***************Income Details Ins Upd******************//////////////////////////
+DELIMITER $$
+CREATE PROCEDURE sp_incomedetails_ins_upd(IN `in_Id` INT(11), IN `in_IncomeTitle` VARCHAR(200), IN `in_IncomeDescription` VARCHAR(200), IN `in_IncomeMoney` FLOAT(10,2), IN `in_IncomeCategoryId` INT(11), IN `in_IncomeDate` DATE, IN `in_CreatedBy` INT(11), IN `in_ModifiedBy` INT(11))
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM  incomedetails)+1);
+  IF  in_Id = 0 THEN
+  	INSERT INTO incomedetails(Id, IncomeTitle, IncomeDescription, IncomeMoney, IncomeCategoryId, IncomeDate,  CreatedBy, ModifiedBy, Status) VALUES(MaxId,  in_IncomeTitle, in_IncomeDescription, in_IncomeMoney, in_IncomeCategoryId, in_IncomeDate,  in_CreatedBy, in_ModifiedBy, 0);
+  
+  ELSE
+  	UPDATE incomedetails
+    	SET
+    IncomeTitle = in_IncomeTitle,
+    IncomeDescription = in_IncomeDescription,
+    IncomeMoney = in_IncomeMoney,
+    IncomeCategoryId =  in_IncomeCategoryId,
+    IncomeDate = in_IncomeDate,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+DELIMITER ;
+
+
+
+/////////////****************Income Details Sel Sel by Id**************////////////////////
+DELIMITER $$
+CREATE PROCEDURE sp_incomedetails_sel_selbyid(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+  	SELECT inc.Id, inc.IncomeTitle, inc.IncomeDescription, inc.IncomeMoney, inc.IncomeCategoryId, inc.IncomeDate, (SELECT FullName FROM user WHERE Id = inc.CreatedBy) AS CreatedBy, (SELECT FullName FROM user WHERE Id = inc.ModifiedBy) AS ModifiedBy, inct.IncomeCategoryName FROM incomedetails inc,  incomecategory inct WHERE inc.IncomeCategoryId = inct.Id AND inc.Status <> 9 ORDER BY inc.Id DESC;
+  ELSE 
+  	SELECT inc.Id, inc.IncomeTitle, inc.IncomeDescription, inc.IncomeMoney, inc.IncomeCategoryId, inc.IncomeDate, (SELECT FullName FROM user WHERE Id = inc.CreatedBy) AS CreatedBy, (SELECT FullName FROM user WHERE Id = inc.ModifiedBy) AS ModifiedBy, inct.IncomeCategoryName FROM incomedetails inc,  incomecategory inct WHERE inc.IncomeCategoryId = inct.Id and  inc.Id = in_Id ORDER BY inc.Id DESC;
+
+     
+  END IF;
+
+END$$
+DELIMITER ;
+
+
+
+///////////****************Income Details Del***************///////////////////////////
+DELIMITER $$
+CREATE  PROCEDURE sp_incomedetails_del(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT 
+)
+BEGIN
+  
+  	UPDATE  incomedetails 
+    	SET
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 9
+    	WHERE 
+    Id = in_Id;
+    
+  
+END$$
+DELIMITER ;

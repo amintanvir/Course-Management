@@ -1,0 +1,13 @@
+DELIMITER $$
+
+CREATE PROCEDURE calctotal(
+)
+
+BEGIN
+
+  select * from coursecategory;
+  
+  
+END$$
+
+DELIMITER ;

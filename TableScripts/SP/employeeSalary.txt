@@ -1,0 +1,56 @@
+////////*************Employee Salary Ins Upd********************///////////////
+
+DELIMITER $$
+	CREATE PROCEDURE sp_employeesalary_ins_upd(
+		IN in_Id INT,
+		IN in_CurrentSalary FLOAT(10,2),
+		IN in_PaidSalary FLOAT(10,2),		
+		IN in_EmployeeId INT, 
+		IN in_SalaryDate DATE,
+		IN in_CreatedBy INT,
+		IN in_ModifiedBy INT
+	)
+	BEGIN
+		DECLARE MaxId INT;
+		SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM  employeesalary)+1);
+
+		IF in_Id = 0 THEN
+			INSERT INTO employeesalary(Id, CurrentSalary, PaidSalary, EmployeeId, SalaryDate, CreatedBy, 
+
+ModifiedBy)
+			VALUES 
+		(MaxId, in_CurrentSalary, in_PaidSalary, in_EmployeeId, in_SalaryDate, in_CreatedBy, in_ModifiedBy);
+		
+		ELSE
+			UPDATE employeesalary
+				SET
+			CurrentSalary = in_CurrentSalary,
+			PaidSalary = in_PaidSalary,
+			EmployeeId = in_EmployeeId, 
+			SalaryDate = in_SalaryDate,
+			CreatedBy = in_CreatedBy,
+			ModifiedBy = in_ModifiedBy
+				WHERE
+			Id = in_Id;
+		END IF;
+
+	END$$
+DELIMITER ;
+
+
+//*********************Employee Salary Sel SelById With Limit*******************///////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_employeesalary_sel_selbyid_limit`(in in_Id INT, in in_Limit INT)
+
+BEGIN
+    
+    if (in_Id > 0) then
+        SELECT es.Id, es.CurrentSalary, es.PaidSalary, es.EmployeeId, es.SalaryDate, es.CreatedBy, es.ModifiedBy, es.ModifyDate, c.FullName, c.ContactNumber, c.UserType, (SELECT UserName FROM user WHERE Id=es.CreatedBy) AS CreatedByUserName, (SELECT UserName FROM user WHERE Id=es.ModifiedBy) AS ModifiedByUserName FROM employeesalary es, courseteacher c WHERE es.EmployeeId = c.Id AND es.Id=in_Id ORDER BY es.Id DESC;
+    elseif (in_Limit > 0) then
+        SELECT es.Id, es.CurrentSalary, es.PaidSalary, es.EmployeeId, es.SalaryDate, es.CreatedBy, es.ModifiedBy, es.ModifyDate, c.FullName, c.ContactNumber, c.UserType, (SELECT UserName FROM user WHERE Id=es.CreatedBy) AS CreatedByUserName, (SELECT UserName FROM user WHERE Id=es.ModifiedBy) AS ModifiedByUserName FROM employeesalary es, courseteacher c WHERE es.EmployeeId = c.Id ORDER BY es.Id DESC LIMIT in_Limit;
+    else 
+        SELECT es.Id, es.CurrentSalary, es.PaidSalary, es.EmployeeId, es.SalaryDate, es.CreatedBy, es.ModifiedBy, es.ModifyDate, c.FullName, c.ContactNumber, c.UserType, (SELECT UserName FROM user WHERE Id=es.CreatedBy) AS CreatedByUserName, (SELECT UserName FROM user WHERE Id=es.ModifiedBy) AS ModifiedByUserName FROM employeesalary es, courseteacher c WHERE es.EmployeeId = c.Id ORDER BY es.Id DESC;
+    end if;
+
+END

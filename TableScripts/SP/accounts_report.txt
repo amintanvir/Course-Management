@@ -1,0 +1,10 @@
+DELIMITER $
+CREATE PROCEDURE sp_expense_report_for_month(
+	IN in_FromDate DATE,
+	IN in_ToDate DATE
+)
+BEGIN
+	IF in_FromDate = "" THEN
+	
+END$$
+DELIMITER ;

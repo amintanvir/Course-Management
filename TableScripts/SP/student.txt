@@ -1,0 +1,104 @@
+/////////////////**********Insert Update******************///////////////////////////
+
+DELIMITER $$
+CREATE PROCEDURE `sp_student_ins_upd`(
+    IN in_Id INT(11),
+    IN in_FullName VARCHAR(80),
+    IN in_Address VARCHAR(400),
+    IN in_AcademicDescription VARCHAR(400),
+    IN in_StudentId VARCHAR(400),
+    IN in_JoinDate date ,
+    IN in_OtherInfo varchar(400),
+    IN in_Contact varchar(14),
+    IN in_Email varchar(80),
+    IN in_Picture varchar(60),
+   
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM   student)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO  student(Id, FullName,  Address, AcademicDescription, StudentId, JoinDate, OtherInfo, Contact, Email, Picture, CreatedBy, ModifiedBy, Status) 
+VALUES(MaxId, in_FullName, in_Address, in_AcademicDescription, in_StudentId, in_JoinDate, in_OtherInfo, in_Contact, in_Email, in_Picture, in_CreatedBy, in_ModifiedBy, 0);
+  ELSE
+  	UPDATE  student 
+    	SET
+    FullName = in_FullName,
+    Address =  in_Address,
+    AcademicDescription =  in_AcademicDescription,
+    StudentId = in_StudentId,
+    JoinDate = in_JoinDate,
+    OtherInfo  =  in_OtherInfo,
+    Contact  =  in_Contact,
+    Email  =  in_Email,
+    Picture  =  in_Picture,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+
+DELIMITER ;
+
+
+
+
+////////////***********Student Delete*************//////////////////
+
+DELIMITER $$
+CREATE PROCEDURE `sp_student_del`
+( 
+   IN in_Id INT(11), 
+   IN in_ModifiedBy INT(11) 
+) 
+BEGIN 
+   UPDATE student 
+	SET 
+   ModifiedBy = in_ModifiedBy, 
+   ModifyDate = now(), 
+   Status = 9 
+	WHERE 
+   Id = in_Id; 
+END$$
+
+DELIMITER ;
+
+
+
+////////////**********Student Sel SelBYId**********//////
+
+
+DELIMITER $$
+CREATE PROCEDURE `sp_student_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+
+IF in_Id = 0 THEN
+
+	SELECT s.Id, s.FullName, s.Address, s.AcademicDescription, s.StudentId, s.JoinDate, s.OtherInfo, s.Contact, s.Email, s.Picture, (SELECT UserName 	FROM user WHERE Id = s.CreatedBy) AS CreatedByUser, (SELECT UserName FROM user WHERE Id = s.CreatedBy) AS 	ModifiedByUser, s.CreatedBy, s.ModifiedBy, s.Status FROM student s WHERE s.Status<>9 ORDER BY s.Id DESC;
+ELSE
+	SELECT s.Id, s.FullName, s.Address, s.AcademicDescription, s.StudentId, s.JoinDate, s.OtherInfo, s.Contact, s.Email, s.Picture, (SELECT UserName 	FROM user WHERE Id = s.CreatedBy) AS CreatedByUser, (SELECT UserName FROM user WHERE Id = s.CreatedBy) AS 	ModifiedByUser, s.CreatedBy, s.ModifiedBy, s.Status FROM student s WHERE s.Status<>9 AND s.Id = in_Id ORDER BY s.Id DESC;
+END IF;
+END$$
+DELIMITER ;
+
+
+
+////////////***************Check Exist*****************//////////
+DELIMITER $$
+CREATE PROCEDURE `sp_student_exist`(
+    IN in_Email VARCHAR(80),
+    IN in_Contact VARCHAR(14),
+    IN in_StudentId VARCHAR(40)
+)
+BEGIN
+	SELECT Id FROM Student WHERE Status<>9 AND (Email=in_Email OR Contact=in_Contact OR StudentId=in_StudentId);
+END$$
+DELIMITER ;

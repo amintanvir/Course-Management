@@ -1,0 +1,106 @@
+/////////*******************courseregistration ins upd****************//////////////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_courseregistration_ins_upd`(
+    IN in_Id INT(11),
+    IN in_StudentId INT(11),
+    IN in_CourseId INT(11),
+    IN in_RegistrationDate DATE,
+    IN in_PaidAmount FLOAT(10,2),
+    IN in_PaybleAmount FLOAT(10,2),
+    IN in_PaymentDate DATE,
+    IN in_DuePaymentDate DATE,
+    IN in_Discount INT,
+    IN in_CreatedBy INT,
+    IN in_ModifiedBy INT
+)
+BEGIN
+  DECLARE MaxId INT;
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM  courseregistration)+1);
+  IF  in_Id = 0 THEN
+  	INSERT INTO courseregistration(Id, StudentId, CourseId, RegistrationDate, PaidAmount, PaybleAmount, PaymentDate, DuePaymentDate, Discount, CreatedBy, ModifiedBy, Status) VALUES(MaxId, in_StudentId, in_CourseId, in_RegistrationDate, in_PaidAmount, in_PaybleAmount, in_PaymentDate,  in_DuePaymentDate, in_Discount, in_CreatedBy, in_ModifiedBy, 0);
+  ELSE
+  	UPDATE courseregistration 
+    	SET
+    StudentId = in_StudentId,
+    CourseId = in_CourseId,
+    RegistrationDate = in_RegistrationDate,
+    PaidAmount =  in_PaidAmount,
+    PaybleAmount = in_PaybleAmount,
+    PaymentDate = in_PaymentDate,
+    DuePaymentDate = in_DuePaymentDate,
+    Discount = in_Discount,
+    
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+
+
+  END$$
+DELIMITER ;
+
+
+
+
+
+/////////*******************courseregistration sel selbyid****************//////////////////////
+
+DELIMITER $$
+CREATE PROCEDURE sp_courseregistration_sel_selbyid(
+    IN in_Id INT
+    )
+    BEGIN
+    IF in_Id=0 THEN
+    SELECT cr.Id, cr.StudentId, cr.CourseId, cr.RegistrationDate, cr.PaidAmount, cr.PaybleAmount, cr.PaymentDate, cr.DuePaymentDate, cr.Discount, cr.CreatedBy, cr.CreationDate, cr.ModifiedBy, cr.ModifyDate, cr.Status, (SELECT UserName FROM user WHERE Id = cr.CreatedBy) AS CreatedByUserName, (SELECT UserName FROM user WHERE Id = cr.ModifiedBy) AS ModifiedByUserName, cd.CourseName, cd.CoursePrice, s.FullName, s.Contact, s.Email FROM courseregistration cr, coursedetails cd, student s WHERE cr.CourseId = cd.Id AND cr.StudentId = s.Id AND cr.Status <> 9 ORDER BY cr.Id DESC;
+    ELSE 
+    SELECT cr.Id, cr.StudentId, cr.CourseId, cr.RegistrationDate, cr.PaidAmount, cr.PaybleAmount, cr.PaymentDate, cr.DuePaymentDate, cr.Discount, cr.CreatedBy, cr.CreationDate, cr.ModifiedBy, cr.ModifyDate, cr.Status, (SELECT UserName FROM user WHERE Id = cr.CreatedBy) AS CreatedByUserName, (SELECT UserName FROM user WHERE Id = cr.ModifiedBy) AS ModifiedByUserName, cd.CourseName, cd.CoursePrice, s.FullName, s.Contact, s.Email FROM courseregistration cr, coursedetails cd, student s WHERE cr.CourseId = cd.Id AND cr.StudentId = s.Id AND cr.Id = in_Id ORDER BY cr.Id DESC;
+    END IF;
+ END$$
+ 
+ DELIMITER ;
+
+
+///////*******************courseregistration del*********************/////////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_courseregistration_del`(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT
+)
+BEGIN
+    UPDATE courseregistration 
+    	SET
+    
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 9
+    	WHERE 
+    Id = in_Id;
+
+  END$$
+DELIMITER ;
+
+
+
+/////////***********Select course registration by due date****************/////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_courseregistration_sel_due_date`(
+    IN in_DuePaymentDate DATE
+)
+BEGIN
+    SELECT cr.Id,  cr.RegistrationDate, cr.PaybleAmount, cr.PaymentDate, 
+
+cr.DuePaymentDate,  cd.CourseName,  s.FullName, s.Picture 
+ FROM courseregistration cr, coursedetails cd, student s 
+ WHERE cr.CourseId = cd.Id AND cr.StudentId = s.Id AND cr.Status <> 9 AND 
+cr.DuePaymentDate=in_DuePaymentDate ORDER BY cr.Id DESC;
+  END$$
+DELIMITER ;
+
+
+

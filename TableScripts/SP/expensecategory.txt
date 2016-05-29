@@ -1,0 +1,69 @@
+////***Expense CategoryAdd And Update***************///////////
+DELIMITER $$
+CREATE PROCEDURE `sp_expencecategory_ins_upd`(
+    IN in_Id INT(11),
+    IN in_ExpenseCategoryName VARCHAR(80),
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11)
+    
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM expensecategory)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO expensecategory(Id, ExpenseCategoryName, CreatedBy, ModifiedBy) VALUES(MaxId, in_ExpenseCategoryName, in_CreatedBy, 
+
+in_ModifiedBy);
+  ELSE
+  	UPDATE expensecategory 
+    	SET
+    ExpenseCategoryName = in_ExpenseCategoryName,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+DELIMITER ;
+
+
+////***Expense Category Select***************////////////////////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_expensecategory_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+   SELECT * , (Select UserName FROM user WHERE Id = expensecategory.CreatedBy) AS CreatedByUserName,   
+(Select UserName FROM user WHERE Id = expensecategory.ModifiedBy) AS ModifiedByUserName FROM expensecategory WHERE Status<>9 ORDER BY Id DESC;
+  ELSE
+      SELECT * , (Select UserName FROM user WHERE Id = expensecategory.CreatedBy) AS CreatedByUserName,   
+(Select UserName FROM user WHERE Id = expensecategory.ModifiedBy) AS ModifiedByUserName FROM expensecategory WHERE Id=in_Id ORDER BY Id DESC;
+    
+  END IF;
+END$$
+DELIMITER ;
+
+
+///////////////*Expense Category Delete************//////////////
+
+
+DELIMITER $$
+CREATE PROCEDURE `sp_expensecategory_del`(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+UPDATE expensecategory 
+    	SET
+    ModifyDate = now(),
+    ModifiedBy = in_ModifiedBy,
+    Status = 9
+	WHERE 
+    Id = in_Id;
+	
+END$$
+DELIMITER ;

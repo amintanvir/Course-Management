@@ -1,0 +1,130 @@
+///////////////////*******************Course Details Ins Upd**************************/////////////////////////
+
+DELIMITER $$
+
+CREATE PROCEDURE `sp_coursedetails_ins_upd`(
+    IN in_Id INT(11),
+    IN in_CourseCategoryId INT(11),
+    IN in_CourseName VARCHAR(80),
+    IN in_CourseDetails  VARCHAR(72),
+    IN in_CoursePrice float(10,2), 
+    IN in_CourseDuration  VARCHAR(42),
+    IN in_StartDate Date,
+    IN in_CourseTime VARCHAR(34),
+    IN in_CourseSchedule VARCHAR(400),
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11),
+    IN in_BatchNo VARCHAR(40)
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM  coursedetails)+1);
+  IF  in_Id = 0 THEN
+  	INSERT INTO coursedetails(Id, CourseCategoryId, CourseName, CourseDetails, CoursePrice, CourseDuration, StartDate, CourseTime, CourseSchedule, CreatedBy, ModifiedBy, Status, BatchNo) VALUES(MaxId, in_CourseCategoryId, in_CourseName, in_CourseDetails, in_CoursePrice, in_CourseDuration, in_StartDate,  in_CourseTime, in_CourseSchedule, in_CreatedBy, in_ModifiedBy, 0, in_BatchNo);
+  ELSE
+  	UPDATE coursedetails 
+    	SET
+    CourseName = in_CourseName,
+    CourseCategoryId = in_CourseCategoryId,
+    CourseDetails = in_CourseDetails,
+    CoursePrice =  in_CoursePrice,
+    CourseDuration = in_CourseDuration,
+    StartDate = in_StartDate,
+    CourseTime = in_CourseTime,
+    CourseSchedule = in_CourseSchedule,
+    
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1,
+    BatchNo = in_BatchNo
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+
+
+  END$$
+DELIMITER ;
+
+
+
+
+
+/////////////*********************SELECT SELECT BY ID********************///////////////////////
+
+DELIMITER $$
+
+CREATE PROCEDURE `sp_coursedetails_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+  	SELECT cd.Id, cd.CourseCategoryId, cd.CourseName, cd.CourseDetails, cd.CoursePrice, cd.CourseDuration, cd.StartDate, cd.CourseTime, cd.CourseSchedule, (SELECT FullName FROM user WHERE Id = cd.CreatedBy) AS CreatedByUserName,  (SELECT FullName FROM user WHERE Id = cd.ModifiedBy) AS ModifiedByUserName, c.CategoryName, cd.CreatedBy, cd.CreationDate,
+cd.ModifiedBy, cd.ModifyDate, cd.BatchNo FROM coursedetails cd, coursecategory c WHERE cd.CourseCategoryId = c.Id AND cd.Status <> 9  ORDER BY cd.Id DESC;
+  ELSE 
+  	SELECT cd.Id, cd.CourseCategoryId, cd.CourseName, cd.CourseDetails, cd.CoursePrice, cd.CourseDuration, cd.StartDate, cd.CourseTime, cd.CourseSchedule, (SELECT FullName FROM user WHERE Id = cd.CreatedBy) AS CreatedByUserName,  (SELECT FullName FROM user WHERE Id = cd.ModifiedBy) AS ModifiedByUserName, c.CategoryName, cd.CreatedBy, cd.CreationDate,
+cd.ModifiedBy, cd.ModifyDate, cd.BatchNo FROM coursedetails cd, coursecategory c WHERE cd.CourseCategoryId = c.Id AND cd.Id = in_Id ORDER BY cd.Id DESC;
+     
+  END IF;
+
+ END$$
+
+DELIMITER ;
+
+
+
+////////////////****************SELECT BY COURSECATEGORYID*********************/////////////////////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_coursedetails_selbycoursecategoryid`(
+    IN in_CourseCategoryId INT(11)
+)
+BEGIN
+  	SELECT cd.Id, cd.CourseCategoryId, cd.CourseName, cd.CourseDetails, cd.CoursePrice, cd.CourseDuration, cd.StartDate, cd.CourseTime, cd.CourseSchedule, (SELECT FullName FROM user WHERE Id = cd.CreatedBy) AS CreatedByUserName,  (SELECT FullName FROM user WHERE Id = cd.ModifiedBy) AS ModifiedByUserName, c.CategoryName, cd.CreatedBy, cd.CreationDate,
+cd.ModifiedBy, cd.ModifyDate, cd.BatchNo FROM coursedetails cd, coursecategory c WHERE cd.CourseCategoryId = c.Id AND cd.Status <> 9  AND cd.CourseCategoryId=in_CourseCategoryId ORDER BY cd.Id DESC;
+  
+ END$$
+
+DELIMITER ;
+
+
+
+
+
+
+///////////////////////////*****************Delete********************///////////////////
+
+DELIMITER $$
+
+CREATE PROCEDURE `sp_coursedetails_del`(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+UPDATE coursedetails 
+    	SET
+    ModifyDate = now(),
+    ModifiedBy = in_ModifiedBy,
+    Status = 9
+	WHERE 
+    Id = in_Id;
+	
+END$$
+
+DELIMITER ;
+
+
+
+///////////*************cHECK eXIST***************///////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_coursedetails_checkexist`(
+    IN in_CourseName VARCHAR(80),
+    IN in_CourseCategoryId INT,
+    IN in_BatchNo VARCHAR(40)
+)
+BEGIN
+  	SELECT Id FROM coursedetails WHERE Status<>9 AND CourseName=in_CourseName AND 
+
+CourseCategoryId=in_CourseCategoryId AND BatchNo=in_BatchNo ORDER BY Id DESC;
+END$$
+DELIMITER ;

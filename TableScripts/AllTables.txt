@@ -1,0 +1,188 @@
+/////*************************User Table******************////////////////////////
+CREATE TABLE user(
+  Id int not null auto_increment,
+  FullName varchar(100) not null,
+  UserName varchar(200) not null,
+  Password varchar(40) not null,
+  UserType varchar(40) not null,
+    
+  Constraint PK_User_Id Primary Key(Id),
+  Constraint UK_User_UserName Unique Key(UserName)
+);
+
+
+
+///////*******************Course Category**************************/////////////////
+CREATE TABLE CourseCategory(
+    Id int not null auto_increment,
+    CategoryName varchar(80),
+    CreationDate timestamp DEFAULT CURRENT_TIMESTAMP,
+    CreatedBy int not null,
+    ModifyDate timestamp DEFAULT CURRENT_TIMESTAMP,
+    ModifiedBy int not null,
+    
+    Constraint PK_CourseCategory_Id Primary Key(Id),
+    Constraint FK_CreatedBy Foreign Key(CreatedBy) REFERENCES user(Id),
+    Constraint FK_ModifiedBy Foreign Key(ModifiedBy) REFERENCES user(Id)
+);
+
+
+///////*****************Course Details****************************////////////////////
+CREATE TABLE CourseDetails(
+    Id int not null auto_increment,
+    CourseName varchar(80) not null,
+    CourseDetails varchar(80) not null,
+    CoursePrice float(6,2) not null,
+    CourseDuration varchar(40) not null,
+    StartDate date not null,
+    CourseTime varchar(40) not null,
+    CourseSchedule varchar(400) not null,
+    CreatedBy int not null,
+    CreationDate timestamp not null default CURRENT_TIMESTAMP,
+    ModifiedBy int not null,
+    ModifyDate timestamp not null default CURRENT_TIMESTAMP,
+    Status int not null
+    
+    Constraint PK_CourseDetails_Id PRIMARY KEY(Id),
+    Constraint Fk_CourseDetails_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES user(Id),
+    Constraint Fk_CourseDetails_ModifiedBy FOREIGN KEY(ModifiedBy) REFERENCES user(Id)
+);
+
+
+
+//////***************Student Information***************************////////////////
+CREATE TABLE Student(
+  Id int not null auto_increment,
+  FullName varchar(40) not null,
+  Address varchar(400) not null,
+  AcademicDescription varchar(400) not null,
+  StudentId varchar(40) not null,
+  JoinDate DATE not null,
+  OtherInfo varchar(2000) not null,
+  CreatedBy int not null,
+  CreationDate timestamp default CURRENT_TIMESTAMP,
+  ModifiedBy int not null,
+  ModifyDate timestamp default CURRENT_TIMESTAMP,
+  Status int not null,
+  
+    
+  Constraint PK_Student_Id PRIMARY KEY(Id),
+  Constraint FK_Student_CreatedBy Foreign Key(CreatedBy) References user(Id),
+  Constraint Fk_Student_ModifiedBy Foreign Key(ModifiedBy) References user(Id)
+);
+
+
+/////////************Course Registration***********************///////////////
+CREATE TABLE CourseRegistration(
+    Id int not null auto_increment,
+    StudentId int not null,
+    CourseId int not null,
+    RegistrationDate date not null,
+    PaidAmount float(6,2) not null default 0,
+    PaybleAmount float(6,2) not null default 0,
+    PaymentDate date not null,
+    DuePaymentDate date not null,
+    Discount int not null default 0,
+    CreatedBy int not null,
+    CreationDate timestamp default CURRENT_TIMESTAMP,
+    ModifiedBy int not null,
+    ModifyDate timestamp default CURRENT_TIMESTAMP,
+    
+    Constraint Pk_CourseRegistration_Id Primary Key(Id),
+    Constraint Fk_CourseRegistration_CreatedBy Foreign Key(CreatedBy) References user(Id),
+    Constraint Fk_CourseRegistration_ModifiedBy Foreign Key(ModifiedBy) References user(Id)
+);
+
+
+///////*******************Expense Category**************************/////////////////
+CREATE TABLE expensecategory(
+    Id int not null,
+    CategoryName varchar(80),
+    CreationDate timestamp DEFAULT CURRENT_TIMESTAMP,
+    CreatedBy int not null,
+    ModifyDate timestamp DEFAULT CURRENT_TIMESTAMP,
+    ModifiedBy int not null,
+    Status int not null, 
+
+    Constraint PK_ExpenseCategory_Id Primary Key(Id),
+    Constraint FK_ExpenseCategory_CreatedBy Foreign Key(CreatedBy) REFERENCES user(Id),
+    Constraint FK_ExpenseCategory_ModifiedBy Foreign Key(ModifiedBy) REFERENCES user(Id)
+);
+
+////////******************Expense Details*******************///////////////////
+CREATE TABLE expensedetails(
+    Id INT NULL, 
+    ExpenseTitle VARCHAR(200) NOT NULL,
+    ExpenseDescription VARCHAR(400) NOT NULL,
+    ExpenseMoney FLOAT(8,4) NOT NULL,
+    ExpenseCategoryId INT NOT NULL,
+    ExpenseDate DATE NOT NULL,
+    CreationDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CreatedBy INT NOT NULL,
+    ModifyDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ModifiedBy INT NOT NULL,
+    CONSTRAINT PK_ExpenseDetails_Id PRIMARY KEY(Id),
+    CONSTRAINT FK_ExpenseDetails_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES user(Id),
+    CONSTRAINT FK_ExpenseDetails_ModifiedBy FOREIGN KEY(ModifiedBy) REFERENCES user(Id)
+    
+);
+
+////////******************Course Teacher*******************///////////////////
+CREATE TABLE CourseTeacher
+( 
+	Id INT NOT NULL, 
+	FullName VARCHAR(80) NOT NULL, 
+	Address VARCHAR(200) NOT NULL, 
+	ContactNumber VARCHAR(14) NOT NULL,
+	Email VARCHAR(80) NOT NULL,
+	InterestedArea VARCHAR(400) NOT NULL, 
+	Designation VARCHAR(60) NOT NULL, 
+	AcademicDescription VARCHAR(400) NOT NULL, 
+	Message VARCHAR(1000) NOT NULL, 
+	JoinDate DATE NOT NULL, 
+	EmployementStatus INT NOT NULL, 
+	CreationDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+	CreatedBy INT NOT NULL, 
+	ModifyDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+	ModifiedBy INT NOT NULL, Status INT NOT NULL, 
+	CONSTRAINT PK_CourseTeacher_Id PRIMARY KEY(Id), 
+	CONSTRAINT FK_CourseTeacher_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES user(Id), 
+	CONSTRAINT FK_CourseTeacher_ModifiedBy FOREIGN KEY(ModifiedBy) REFERENCES user(Id) 
+);
+
+
+////////****************Assign Teacher To Course******************///////////////
+CREATE TABLE assignteachertoclass(
+    Id INT NOT NULL,
+    TeacherId INT NOT NULL,
+    CourseDetailsId INT NOT NULL,
+    AssignDate DATE,
+    OtherInfo VARCHAR(600) NOT NULL,
+    CreationDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CreatedBy INT NOT NULL,
+    ModifyDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ModifiedBy INT NOT NULL,
+    Status INT NOT NULL,
+    
+    CONSTRAINT PK_assignteachertoclass_Id PRIMARY KEY(Id),
+    CONSTRAINT FK_assignteachertoclass_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES user(Id),
+    CONSTRAINT FK_assignteachertoclass_ModifiedBy FOREIGN KEY(ModifiedBy) REFERENCES user(Id)
+);
+
+
+
+//////*****************EmployeeSalary*******************////////////////////////
+CREATE TABLE employeesalary(
+    	Id INT NOT NULL,
+    	CurrentSalary FLOAT(10,2) NOT NULL,
+    	PaidSalary FLOAT(10,2) NOT NULL,
+    	EmployeeId INT NOT NULL,
+    	SalaryDate DATE NOT NULL,
+    	CreatedBy INT NOT NULL,
+    	ModifiedBy INT NOT NULL,
+    	ModifyDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    	CONSTRAINT PK_employeesalary_Id PRIMARY KEY(Id),
+    	CONSTRAINT FK_employeesalary_EmployeeId FOREIGN KEY(EmployeeId) REFERENCES courseteacher(Id),
+    	CONSTRAINT FK_employeesalary_CreatedBy FOREIGN KEY(CreatedBy) REFERENCES user(Id),
+    	CONSTRAINT FK_employeesalary_ModifiedBy FOREIGN KEY(ModifiedBy) REFERENCES user(Id)
+);

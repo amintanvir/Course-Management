@@ -1,0 +1,23 @@
+.hide-column{
+	display: none !important;
+}
+
+.edit,.delete{
+	cursor: pointer !important;
+}
+
+.half-black{
+	background-color: #a3a3a3 !important;
+}
+
+.portlet.box.half-black{
+	border: 1px #a3a3a3 solid;
+}
+
+.edit-color{
+	color: green !important; font-weight: bold !important;
+}
+
+.operation{
+	text-align: center !important;
+}

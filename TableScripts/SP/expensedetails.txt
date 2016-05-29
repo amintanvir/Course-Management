@@ -1,0 +1,81 @@
+///////////**********Expense Details Add Update **********//////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_expensedetails_ins_upd`(
+    
+    IN in_Id INT(11),
+    IN in_ExpenseTitle VARCHAR(200),
+    IN in_ExpenseDescription VARCHAR(200),
+    IN in_ExpenseMoney float(8,4),
+    IN in_ExpenseCategoryId INT(11),
+    IN in_ExpenseDate Date,
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM  expensedetails)+1);
+  IF  in_Id = 0 THEN
+  	INSERT INTO expensedetails(Id, ExpenseTitle, ExpenseDescription, ExpenseMoney, ExpenseCategoryId, ExpenseDate,  CreatedBy, ModifiedBy, Status) VALUES(MaxId,  in_ExpenseTitle, in_ExpenseDescription, in_ExpenseMoney, in_ExpenseCategoryId, in_ExpenseDate,  in_CreatedBy, in_ModifiedBy, 0);
+  
+  ELSE
+  	UPDATE expensedetails
+    	SET
+    ExpenseTitle = in_ExpenseTitle,
+    ExpenseDescription = in_ExpenseDescription,
+    ExpenseMoney = in_ExpenseMoney,
+    ExpenseCategoryId =  in_ExpenseCategoryId,
+    ExpenseDate = in_ExpenseDate,
+    
+    
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+
+DELIMITER ;
+
+
+
+/////////////******************Expense Details Select************////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_expensedetails_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+  	SELECT ex.Id, ex.ExpenseTitle, ex.ExpenseDescription, ex.ExpenseMoney, ex.ExpenseCategoryId, ex.ExpenseDate, (SELECT FullName FROM user WHERE Id = ex.CreatedBy) AS CreatedBy, (SELECT FullName FROM user WHERE Id = ex.ModifiedBy) AS ModifiedBy, exn.ExpenseCategoryName FROM expensedetails ex, expensecategory exn WHERE ex.ExpenseCategoryId = exn.Id AND ex.Status <> 9 ORDER BY ex.Id DESC;
+  ELSE 
+  	SELECT ex.Id, ex.ExpenseTitle, ex.ExpenseDescription, ex.ExpenseMoney, ex.ExpenseCategoryId, ex.ExpenseDate, (SELECT FullName FROM user WHERE Id = ex.CreatedBy) AS CreatedBy, (SELECT FullName FROM user WHERE Id = ex.ModifiedBy) AS ModifiedBy, exn.ExpenseCategoryName FROM expensedetails ex, expensecategory exn WHERE ex.ExpenseCategoryId = exn.Id and  ex.Id = in_Id ORDER BY ex.Id DESC;
+     
+  END IF;
+
+ END$$
+DELIMITER ;
+
+
+
+/////////////***************Expense Detaisl Delete **********///////////
+
+
+DELIMITER $$
+CREATE PROCEDURE `sp_expensedetails_del`(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT 
+)
+BEGIN
+  
+  	UPDATE  expensedetails 
+    	SET
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 9
+    	WHERE 
+    Id = in_Id;
+END$$
+DELIMITER ;
+

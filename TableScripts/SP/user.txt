@@ -1,0 +1,52 @@
+
+////////////////*************User Login****************************///////////////
+DELIMITER $$
+
+CREATE DEFINER=`almamate`@`localhost` PROCEDURE `sp_user_login`(
+    IN in_UserName VARCHAR(200),
+    IN in_Password VARCHAR(40)
+)
+BEGIN
+  SELECT Id, UserName, UserType FROM user WHERE UserName = in_UserName AND Password = in_Password;
+END$$
+
+DELIMITER ;
+
+
+
+/////////////*********User Sel SelbyId*********************//////////////////
+
+DELIMITER $$
+CREATE PROCEDURE `sp_user_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+
+IF in_Id = 0 THEN
+	SELECT * FROM user;
+ELSE
+	SELECT * FROM user WHERE Id = in_Id;
+END IF;
+END$$
+DELIMITER ;
+
+
+
+/////////////*************Update User Password***********************////////////////
+
+DELIMITER $$
+CREATE PROCEDURE `sp_user_change_password`(
+    IN in_Id INT(11),
+    IN in_Password VARCHAR(40)
+)
+BEGIN
+	
+	UPDATE user
+		SET 
+	Password = in_Password
+		WHERE
+	Id = in_Id;
+	
+END$$
+DELIMITER ;
+

@@ -1,0 +1,92 @@
+////////////********************INS UPD*********************////////////////////
+DELIMITER $$
+
+CREATE DEFINER=`almamate`@`localhost` PROCEDURE `sp_coursecategory_ins_upd`(
+    IN in_Id INT(11),
+    IN in_CategoryName VARCHAR(80),
+    IN in_CreatedBy INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM coursecategory)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO coursecategory(Id, CategoryName, CreatedBy, ModifiedBy) VALUES(MaxId, in_CategoryName, in_CreatedBy, 
+
+in_ModifiedBy);
+  ELSE
+  	UPDATE coursecategory 
+    	SET
+    CategoryName = in_CategoryName,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+END$$
+
+DELIMITER ;
+
+
+
+
+
+
+
+//////////*************************DELETE********************************///////////////
+DELIMITER $$
+
+CREATE DEFINER=`almamate`@`localhost` PROCEDURE `sp_coursecategory_del`(
+    IN in_Id INT(11),
+    IN in_ModifiedBy INT(11)
+)
+BEGIN
+  	UPDATE 
+		coursecategory
+	SET
+		ModifyDate = now(),
+		Status = 9,
+		ModifiedBy = in_ModifiedBy
+	WHERE 
+		Id = in_Id;  
+END$$
+
+DELIMITER ;
+
+
+
+
+
+
+/////////**************************SEL SELBYID***********************/////////////////////
+DELIMITER $$
+
+CREATE DEFINER=`almamate`@`localhost` PROCEDURE `sp_coursecategory_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+  IF in_Id = 0 THEN
+  	SELECT * FROM coursecategory WHERE Status<>9 ORDER BY Id DESC;
+  ELSE
+  	SELECT * FROM coursecategory WHERE Id = in_Id  ORDER BY Id DESC;
+    
+  END IF;
+END$$
+DELIMITER ;
+
+
+
+/////////***************CheckExist**********************//////////////////
+DELIMITER $$
+
+CREATE PROCEDURE `sp_coursecategory_checkexist`(
+    IN in_CategoryName VARCHAR(80)
+)
+BEGIN
+  	SELECT Id FROM coursecategory WHERE Status<>9 AND CategoryName=in_CategoryName ORDER BY Id DESC;
+END$$
+DELIMITER ;
+

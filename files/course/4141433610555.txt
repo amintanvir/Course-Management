@@ -1,0 +1,1 @@
+<p>The main focus of this course is Object Oriented Design and Coding. But as the same time it focuses on C# language, database design, ASP.Net, MVC, Unit Testing etc. as though trainees could easily enter in job market after completing this training successfully. There are several class tests, lab test and a project work to verify your learning and understanding.</p>

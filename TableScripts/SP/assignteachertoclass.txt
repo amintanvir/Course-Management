@@ -1,0 +1,63 @@
+///////////***********assignteachertoclass ins upd***********////////////
+
+DELIMITER $$
+CREATE  PROCEDURE sp_assignteachertoclass_ins_upd(
+    IN in_Id INT(11),
+    IN in_TeacherId INT,
+    IN in_CourseDetailsId INT,
+    IN in_AssignDate DATE,
+    IN in_OtherInfo VARCHAR(400),
+    IN in_CreatedBy INT,
+    IN in_ModifiedBy INT
+)
+BEGIN
+  DECLARE MaxId INT(11);
+  SET MaxId = ((SELECT IFNULL(MAX(Id),0) FROM   assignteachertoclass)+1);
+  IF in_Id = 0 THEN
+  	INSERT INTO  assignteachertoclass(Id, 	TeacherId,  CourseDetailsId, AssignDate, OtherInfo, CreatedBy, ModifiedBy, Status) 
+VALUES(MaxId, in_TeacherId, in_CourseDetailsId, in_AssignDate, in_OtherInfo, in_CreatedBy, in_ModifiedBy, 0);
+  ELSE
+  	UPDATE  assignteachertoclass
+    	SET
+    TeacherId = in_TeacherId,
+    CourseDetailsId =  in_CourseDetailsId,
+    AssignDate =  in_AssignDate,
+    OtherInfo = in_OtherInfo,
+    CreatedBy = in_CreatedBy,
+    ModifiedBy = in_ModifiedBy,
+    ModifyDate = now(),
+    Status = 1
+    	WHERE 
+    Id = in_Id;
+    
+  END IF;
+  
+  END$$
+
+DELIMITER ;
+
+
+
+
+////////*********Sel Selbyid***********/////////////
+DELIMITER $$
+CREATE PROCEDURE `sp_assignteachertoclass_sel_selbyid`(
+    IN in_Id INT(11)
+)
+BEGIN
+	IF in_Id=0 THEN 
+    SELECT at.Id, at.TeacherId, at.CourseDetailsId, at.AssignDate, at.OtherInfo, at.CreationDate, at.CreatedBy, 
+
+at.ModifyDate, at.ModifiedBy, at.Status, c.CourseName, t.FullName FROM assignteachertoclass at, coursedetails c, 
+
+courseteacher t WHERE at.CourseDetailsId = c.Id AND at.TeacherId=t.Id ORDER BY at.Id DESC;
+	ELSE
+    SELECT at.Id, at.TeacherId, at.CourseDetailsId, at.AssignDate, at.OtherInfo, at.CreationDate, at.CreatedBy, 
+
+at.ModifyDate, at.ModifiedBy, at.Status, c.CourseName, t.FullName FROM assignteachertoclass at, coursedetails c, 
+
+courseteacher t WHERE at.CourseDetailsId = c.Id AND at.TeacherId=t.Id AND at.Id=in_Id ORDER BY at.Id DESC;
+    END IF;
+END$$
+ 
+ DELIMITER ;
